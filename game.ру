@@ -1,1 +1,91 @@
+import random
 
+
+class Puzzle15:
+    def __init__(self):
+        # Создаем решенное поле и перемешиваем его
+        self.board = [i for i in range(1, 16)] + [0]
+        self.empty_pos = 15  # Позиция пустой клетки (0-15)
+        self.shuffle()
+
+    def shuffle(self):
+        """Перемешивает поле"""
+        random.shuffle(self.board)
+        self.empty_pos = self.board.index(0)
+
+    def display(self):
+        """Выводит текущее состояние поля"""
+        print("\n" + "=" * 20)
+        for i in range(0, 16, 4):
+            row = self.board[i:i + 4]
+            print(" | ".join(f"{num:2}" if num != 0 else "  " for num in row))
+            if i < 12:
+                print("-" * 20)
+        print("=" * 20)
+
+    def is_solved(self):
+        """Проверяет, решена ли головоломка"""
+        return self.board == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0]
+
+    def get_valid_moves(self):
+        """Возвращает список возможных ходов"""
+        moves = []
+        row, col = self.empty_pos // 4, self.empty_pos % 4
+
+        # Проверяем все четыре направления
+        if row > 0: moves.append(self.empty_pos - 4)  # Вверх
+        if row < 3: moves.append(self.empty_pos + 4)  # Вниз
+        if col > 0: moves.append(self.empty_pos - 1)  # Влево
+        if col < 3: moves.append(self.empty_pos + 1)  # Вправо
+
+        return moves
+
+    def move(self, number):
+        """Перемещает указанную плитку на пустое место"""
+        if number not in self.board:
+            print("Такого числа нет на поле!")
+            return False
+
+        pos = self.board.index(number)
+        if pos in self.get_valid_moves():
+            # Меняем местами плитку и пустую клетку
+            self.board[self.empty_pos], self.board[pos] = self.board[pos], self.board[self.empty_pos]
+            self.empty_pos = pos
+            return True
+        else:
+            print("Нельзя переместить эту плитку!")
+            return False
+
+    def play(self):
+        """Основной игровой цикл"""
+        print("Добро пожаловать в игру '15'!")
+        print("Перемещайте плитки, чтобы расставить числа по порядку.")
+        print("Для хода введите число от 1 до 15.")
+        print("Для выхода введите 'q'")
+
+        while True:
+            self.display()
+
+            if self.is_solved():
+                print("\n🎉 Поздравляем! Вы решили головоломку!")
+                break
+
+            user_input = input("\nВведите число для перемещения: ").strip().lower()
+
+            if user_input == 'q':
+                print("Выход из игры.")
+                break
+
+            try:
+                number = int(user_input)
+                if 1 <= number <= 15:
+                    self.move(number)
+                else:
+                    print("Введите число от 1 до 15!")
+            except ValueError:
+                print("Некорректный ввод! Введите число или 'q' для выхода.")
+
+
+if __name__ == "__main__":
+    game = Puzzle15()
+    game.play()
